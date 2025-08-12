@@ -1,0 +1,58 @@
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+filename = "startup_growth_investment_data.csv"
+
+data = np.genfromtxt(
+    filename,
+    delimiter=",",
+    names=True,
+    dtype=None,
+    encoding='utf-8'
+)
+
+print("CSV Columns:", data.dtype.names)
+
+investment = data["Investment_Amount_USD"]
+valuation = data["Valuation_USD"]
+growth = data["Growth_Rate"]  
+industry = data["Industry"]
+startup_names = data["Startup_Name"]
+funding_rounds = data["Funding_Rounds"]
+
+print("\n Basic Statistics")
+print(f"Average Investment Amount: ${np.mean(investment):,.2f}")
+print(f"Average Growth Rate: {np.mean(growth):.2f}%")
+
+print("\n High-Growth Startups (>100%)")
+for i in range(len(data)):
+    if growth[i] > 100:
+        print(f"{startup_names[i]} | {industry[i]} | {growth[i]}%")
+
+filename = "startup_growth_investment_data.csv"
+df = pd.read_csv(filename)
+
+print(" CSV Columns:")
+print(df.columns.tolist())
+
+print("\n Basic Statistics")
+print(f"Average Investment Amount {df['Investment_Amount_USD'].mean():,.2f}")
+print(f"Average Growth_Rate {df['Growth_Rate'].mean():.2f}%")
+
+print("\n High-Growth Startups (>100%)")
+high_growth = df[df['Growth Rate (%)'] > 100]
+
+for _, row in high_growth.iterrows():
+    print(f"{row['Startup Name']} | {row['Industry']} | Growth: {row['Growth Rate (%)']}%")
+
+plt.figure(figsize=(10, 6))
+scatter = plt.scatter(investment, valuation, c=growth, cmap='plasma', s=100, edgecolor='black')
+plt.colorbar(scatter, label='Growth Rate (%)')
+plt.xlabel("Investment Amount (USD)")
+plt.ylabel("Valuation (USD)")
+plt.title("Investment vs Valuation (Colored by Growth Rate)")
+plt.grid(True)
+plt.tight_layout()
+plt.show()

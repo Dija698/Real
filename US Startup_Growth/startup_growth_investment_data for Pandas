@@ -1,0 +1,18 @@
+
+import pandas as pd
+
+filename = "startup_growth_investment_data.csv"
+df = pd.read_csv(filename)
+
+print("🔍 CSV Columns:")
+print(df.columns.tolist())
+
+print("\n Basic Statistics")
+print(f"Average Investment Amount {df['Investment_Amount_USD'].mean():,.2f}")
+print(f"Average Growth_Rate {df['Growth_Rate'].mean():.2f}%")
+
+print("\n High-Growth Startups (>100%)")
+high_growth = df[df['Growth Rate (%)'] > 100]
+
+for _, row in high_growth.iterrows():
+    print(f"{row['Startup Name']} | {row['Industry']} | Growth: {row['Growth Rate (%)']}%")
