@@ -1,0 +1,37 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+df = pd.read_csv('FastFoodRestaurants.csv')
+
+print(df.head())
+
+sns.set(style="whitegrid")
+
+plt.figure(figsize=(12, 6))
+top_cities = df['city'].value_counts().head(10)
+sns.barplot(x=top_cities.index, y=top_cities.values, palette='viridis')
+plt.xticks(rotation=45)
+plt.title('Top 10 Cities with Most Fast Food Restaurants')
+plt.xlabel('City')
+plt.ylabel('Number of Restaurants')
+plt.tight_layout()
+plt.show()
+
+
+if 'Rating' in df.columns:
+    plt.figure(figsize=(8, 5))
+    sns.histplot(df['Rating'].dropna(), bins=20, kde=True, color='skyblue')
+    plt.title('Distribution of Ratings')
+    plt.xlabel('Rating')
+    plt.ylabel('Frequency')
+    plt.tight_layout()
+    plt.show()
+
+if 'State' in df.columns and 'Rating' in df.columns:
+    plt.figure(figsize=(14, 6))
+    sns.boxplot(data=df, x='State', y='Rating', palette='Set2')
+    plt.xticks(rotation=90)
+    plt.title('Ratings by State')
+    plt.tight_layout()
+    plt.show()

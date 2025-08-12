@@ -1,0 +1,8 @@
+
+import pandas as pd
+
+filename = "FastFoodRestaurants.csv"
+df = pd.read_csv(filename)
+
+print("CSV Columns:")
+print(df.columns.tolist())

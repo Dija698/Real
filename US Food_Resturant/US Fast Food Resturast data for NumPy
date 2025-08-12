@@ -1,0 +1,16 @@
+import numpy as np
+
+data = np.genfromtxt('FastFoodRestaurants.csv', delimiter=',', skip_header=1, usecols=(5, 6), filling_values=np.nan)
+
+print("Shape of data:", data.shape)
+
+mean_lat = np.nanmean(data[:, 0])
+mean_lon = np.nanmean(data[:, 1])
+print(f"Mean Latitude: {mean_lat:.4f}, Mean Longitude: {mean_lon:.4f}")
+
+us_mainland = data[(data[:, 0] > 24) & (data[:, 0] < 50) & (data[:, 1] > -125) & (data[:, 1] < -65)]
+print("Entries in US mainland:", us_mainland.shape[0])
+
+ny_lat, ny_lon = 40.7128, -74.0060
+distances = np.sqrt((data[:, 0] - ny_lat)**2 + (data[:, 1] - ny_lon)**2)
+print("Closest restaurant is {:.2f} degrees away from NYC".format(np.nanmin(distances)))
