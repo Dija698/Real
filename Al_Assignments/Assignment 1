@@ -1,0 +1,99 @@
+s = "Python"
+new_str = s[0] + s[len(s)//2] + s[-1]
+print("1. New string:", new_str)
+
+from collections import Counter
+s = "programming"
+print("2. Character occurrences:", dict(Counter(s)))
+
+
+s = "Python"
+print("3. Reversed string:", s[::-1])
+
+s = "Python-is-awesome"
+print("4. Split on hyphens:", s.split('-'))
+
+import re
+s = "Hello, World! @2025"
+clean_s = re.sub(r'[\w\s]', '', s)
+print("5. Removed punctuation:", clean_s)
+
+lst = [1, 2, 3, 4, 5]
+lst.reverse()
+print("1. Reversed list:", lst)
+
+lst = [1, 2, 3, 4]
+squared = [x**2 for x in lst]
+print("2. Squared list:", squared)
+
+lst = ["apple", "", "banana", "", "cherry"]
+filtered = list(filter(None, lst))
+print("3. Without empty strings:", filtered)
+
+lst = [10, 20, 30, 40]
+item_to_find = 20
+new_item = 25
+if item_to_find in lst:
+    idx = lst.index(item_to_find) + 1
+    lst.insert(idx, new_item)
+print("4. Added new item:", lst)
+
+lst = [1, 2, 3, 4, 5]
+old_val, new_val = 3, 99
+lst = [new_val if x == old_val else x for x in lst]
+print("5. Replaced value:", lst)
+
+d = {'a': 100, 'b': 200, 'c': 300}
+print("1. Value exists?", 200 in d.values())
+
+d = {'a': 5, 'b': 2, 'c': 8}
+min_key = min(d, key=d.get)
+print("2. Key with min value:", min_key)
+
+d = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
+keys_to_delete = ['a', 'c']
+for key in keys_to_delete:
+    d.pop(key, None)
+print("3. Dictionary after deletion:", d)
+
+t = (1, 2, 3, 4)
+print("1. Reversed tuple:", t[::-1])
+
+
+t = (10, 20, 30)
+print("2. Value 20:", t[1])
+
+t1 = (1, 2)
+t2 = (3, 4)
+t1, t2 = t2, t1
+print("3. Swapped tuples:", t1, t2)
+
+print("1. First 10 natural numbers:")
+i = 1
+while i <= 10:
+    print(i, end=" ")
+    i += 1
+print()
+
+n = int(input("2. Enter a number for evens: "))
+print("Even numbers:")
+for i in range(2, n+1, 2):
+    print(i, end=" ")
+print()
+
+n = int(input("3. Enter a number for odds: "))
+print("Odd numbers:")
+for i in range(1, n+1, 2):
+    print(i, end=" ")
+print()
+
+n = int(input("4. Enter a number for primes: "))
+print("Prime numbers:")
+for num in range(2, n+1):
+    if all(num % i != 0 for i in range(2, int(num**0.5)+1)):
+        print(num, end=" ")
+print()
+
+num = int(input("5. Enter a number for multiplication table: "))
+for i in range(1, 11):
+    print(f"{num} x {i} = {num*i}")

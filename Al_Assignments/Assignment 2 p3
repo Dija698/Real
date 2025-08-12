@@ -1,0 +1,79 @@
+import pandas as pd
+import numpy as np
+
+print("\nQ1: Creating DataFrame from dictionary")
+data1 = {'X': [78, 85, 96, 80, 86],
+         'Y': [84, 94, 89, 83, 86],
+         'Z': [86, 97, 96, 72, 83]}
+df1 = pd.DataFrame(data1)
+print(df1)
+
+print("\nQ2: Creating DataFrame with specified index labels")
+exam_data = {
+    'name': ['Anastasia', 'Dima', 'Katherine', 'James', 'Emily',
+             'Michael', 'Matthew', 'Laura', 'Kevin', 'Jonas'],
+    'score': [12.5, 9, 16.5, np.nan, 9,
+              20, 14.5, np.nan, 8, 19],
+    'attempts': [1, 3, 2, 3, 2, 3, 1, 1, 2, 1],
+    'qualify': ['yes', 'no', 'yes', 'no', 'no',
+                'yes', 'yes', 'no', 'no', 'yes']
+}
+labels = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
+df = pd.DataFrame(exam_data, index=labels)
+print(df)
+
+print("\nQ2.1: Basic Summary Information")
+print(df.info())
+
+print("\nQ2.2: First 3 rows")
+print(df.head(3))
+
+print("\nQ2.3: Selecting 'name' and 'score' columns")
+print(df[['name', 'score']])
+
+print("\nQ2.4: Select 'name' and 'score' from rows 1, 3, 5, 6")
+print(df.iloc[[1, 3, 5, 6], [0, 1]])
+
+print("\nQ2.5: Rows where attempts > 2")
+print(df[df['attempts'] > 2])
+
+print("\nQ2.6: Number of rows and columns")
+print(df.shape)
+
+print("\nQ2.7: Rows where score between 15 and 20")
+print(df[df['score'].between(15, 20)])
+
+print("\nQ2.8: Rows where attempts < 2 and score > 15")
+print(df[(df['attempts'] < 2) & (df['score'] > 15)])
+
+print("\nQ2.9: Change score in row 'd' to 11.5")
+df.loc['d', 'score'] = 11.5
+print(df)
+
+print("\nQ2.10: Mean score")
+print(df['score'].mean())
+
+print("\nQ2.11: Append new row 'k', then delete it")
+df.loc['k'] = ['Zara', 15.0, 2, 'yes']
+print(df)
+df = df.drop('k')
+print(df)
+
+print("\nQ2.12: Sort by 'name' (desc) then 'score' (asc)")
+print(df.sort_values(by=['name', 'score'], ascending=[False, True]))
+
+print("\nQ2.13: Replace 'yes'/'no' with True/False in 'qualify'")
+df['qualify'] = df['qualify'].map({'yes': True, 'no': False})
+print(df)
+
+print("\nQ2.14: Change 'James' to 'Suresh'")
+df['name'] = df['name'].replace('James', 'Suresh')
+print(df)
+
+print("\nQ2.15: Delete 'attempts' column")
+df = df.drop(columns=['attempts'])
+print(df)
+
+print("\nQ2.16: Write DataFrame to CSV with tab separator")
+df.to_csv('output_dataframe.tsv', sep='\t', index=False)
+print("DataFrame written to 'output_dataframe.tsv'")

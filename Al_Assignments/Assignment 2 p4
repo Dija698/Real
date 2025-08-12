@@ -1,0 +1,364 @@
+import pandas as pd
+
+CSV= "https://raw.githubusercontent.com/ShahzadSarwar10/FULLSTACK-WITH-AI-BOOTCAMP-B1-MonToFri-2.5Month-Explorer/main/DataSetForPractice/macro_monthly.csv"
+
+def print_section(title):
+    print("\n" + "="*80)
+    print(title)
+    print("="*80)
+
+def safe_print_df(df, msg=None, max_rows=10):
+    if msg:
+        print(msg)
+    if df.shape[0] > max_rows:
+        print(df.head(max_rows).to_string(index=True))
+        print(f"... (showing first {max_rows} rows out of {df.shape[0]})")
+    else:
+        print(df.to_string(index=True))
+
+print_section("1) Load CSV into DataFrame (auto-index)")
+try:
+    df = pd.read_csv(CSV)
+    print("Loaded CSV successfully.")
+    safe_print_df(df, "DataFrame preview:")
+except Exception as e:
+    print("Failed to load CSV from URL/path:", CSV)
+    print("Error:", e)
+    raise SystemExit("Fix CSV path/URL and re-run.")
+
+
+def has_cols(*cols):
+    return all(col in df.columns for col in cols)
+
+print_section("2) DataFrame info(), dtypes, describe(), shape")
+print("df.info():")
+df.info()
+print("\n\ndtypes:")
+print(df.dtypes)
+print("\n\ndescribe():")
+
+print(df.describe(include='all'))
+print("\n\nshape:")
+print(df.shape)
+
+print_section("3) DataFrame.to_string() demonstrations")
+print("\n3.a Default to_string() (first 20 rows shown for readability):")
+print(df.head(20).to_string())
+
+print("\n3.b to_string(columns=[...]) - select subset if those columns exist:")
+cols_demo = []
+
+for candidate in ["Industrial_Production", "Manufacturers_New_Orders: Durable Goods",
+                  "Retail_Sales", "Consumer_Price Index", "Year"]:
+    if candidate in df.columns:
+        cols_demo.append(candidate)
+if cols_demo:
+    print("columns used:", cols_demo)
+    print(df.to_string(columns=cols_demo, na_rep="MISSING", max_cols=len(cols_demo)))
+else:
+    print("No demo columns found in dataset for subset example. Available columns:", list(df.columns)[:10])
+
+print("\n3.c to_string with float_format and col_space and header=False (demo if numeric cols exist)")
+def float_fmt(x): return f"{x:0.3f}"
+try:
+    print(df.to_string(float_format=lambda x: f"{x:0.3f}" if isinstance(x, float) else x,
+                       col_space=12,
+                       header=True,
+                       na_rep="NaN",
+                       index=True,
+                       max_rows=20))
+except Exception as e:
+    print("to_string example error:", e)
+
+print_section("4) Top 4 rows (head(4))")
+print(df.head(4).to_string())
+
+print_section("5) Bottom 4 rows (tail(4))")
+print(df.tail(4).to_string())
+
+print_section("6) Access single columns")
+col1 = "Industrial_Production"
+col2 = "Manufacturers_New_Orders: Durable Goods"
+if col1 in df.columns:
+    print(f"\nColumn '{col1}':")
+    print(df[col1].to_string())
+else:
+    print(f"Column '{col1}' not found. Available columns: {list(df.columns)[:10]}")
+
+if col2 in df.columns:
+    print(f"\nColumn '{col2}':")
+    print(df[col2].to_string())
+else:
+    print(f"Column '{col2}' not found. Available columns: {list(df.columns)[:10]}")
+
+print_section("7) Access multiple columns (two-column subset)")
+if has_cols(col1, col2):
+    print(df[[col1, col2]].to_string())
+else:
+    found = [c for c in (col1, col2) if c in df.columns]
+    if found:
+        print("Only found columns:", found)
+        print(df[found].to_string())
+    else:
+        print("Neither column present; available columns:", list(df.columns)[:10])
+
+print_section("8) .loc single row (index value 3)")
+try:
+    row3 = df.loc[3]
+    print("Row with index label 3 (note: default auto index is RangeIndex):")
+    print(row3.to_string())
+except Exception as e:
+    print("Error accessing .loc[3]:", e)
+
+print_section("9) .loc multiple rows [3,5,7]")
+try:
+    rows_357 = df.loc[[3,5,7]]
+    print(rows_357.to_string())
+except Exception as e:
+    print("Error selecting .loc[[3,5,7]]:", e)
+
+print_section("10) .loc slice rows 5:15")
+try:
+    slice_5_15 = df.loc[5:15]
+    print(slice_5_15.to_string())
+except Exception as e:
+    print("Error selecting .loc[5:15]:", e)
+
+print_section("11) Conditional selection: Year in (1993,1994,1997) and Unemployment_Rate >= 1")
+year_col = "Year"
+unemp_col = "Unemployment_Rate"
+if year_col in df.columns and unemp_col in df.columns:
+    cond = df[ (df[year_col].astype(str).isin(["1993","1994","1997"])) & (pd.to_numeric(df[unemp_col], errors='coerce') >= 1) ]
+    print(cond.to_string() if not cond.empty else "No rows match the condition.")
+else:
+    print(f"One or both columns not found: {year_col}, {unemp_col}. Available columns: {list(df.columns)[:10]}")
+
+print_section("12) .loc single row index 9 and select specific columns")
+selected_cols = ["Industrial_Production","Retail_Sales","Manufacturers_New_Orders: Durable Goods","Personal_Consumption_Expenditures"]
+missing = [c for c in selected_cols if c not in df.columns]
+if missing:
+    print("Missing columns for Q12:", missing)
+    present = [c for c in selected_cols if c in df.columns]
+    if present:
+        try:
+            print(df.loc[9, present].to_string())
+        except Exception as e:
+            print("Error printing present columns for row 9:", e)
+    else:
+        print("None of the requested columns present.")
+else:
+    try:
+        print(df.loc[9, selected_cols].to_string())
+    except Exception as e:
+        print("Error accessing .loc[9, selected_cols]:", e)
+
+
+print_section("13) Rows where Industrial_Production <= 0.5 (filter by value)")
+if col1 in df.columns:
+    try:
+        cond13 = df[pd.to_numeric(df[col1], errors='coerce') <= 0.5]
+        print(cond13.to_string() if not cond13.empty else "No rows with Industrial_Production <= 0.5")
+    except Exception as e:
+        print("Error in Q13:", e)
+else:
+    print(f"Column '{col1}' not present.")
+
+print_section("14) Combined condition: Industrial_Production <= 0.5 AND Consumer_Price Index > 0.2")
+cpi_col = "Consumer_Price Index"
+if col1 in df.columns and cpi_col in df.columns:
+    try:
+        cond14 = df[(pd.to_numeric(df[col1], errors='coerce') <= 0.5) & (pd.to_numeric(df[cpi_col], errors='coerce') > 0.2)]
+        print(cond14.to_string() if not cond14.empty else "No matching rows.")
+    except Exception as e:
+        print("Error in Q14:", e)
+else:
+    print("Required columns missing for Q14:", [c for c in (col1, cpi_col) if c not in df.columns])
+
+print_section("15) .iloc single row: 4th row (index 3)")
+try:
+    print(df.iloc[3].to_string())
+except Exception as e:
+    print("Error selecting iloc[3]:", e)
+
+print_section("16) .iloc multiple rows: 2,7,8,36,9 (interpreted as row positions)")
+idxs = [1,6,7,35,8]
+valid = [i for i in idxs if 0 <= i < len(df)]
+if valid:
+    try:
+        print(df.iloc[valid].to_string())
+    except Exception as e:
+        print("Error selecting iloc rows:", e)
+else:
+    print("Requested iloc indices out of bounds. DataFrame length:", len(df))
+
+
+print_section("17) .iloc slice rows 10 to 23 (positions 9:23)")
+try:
+    print(df.iloc[9:23].to_string() if not df.iloc[9:23].empty else "No rows in this slice.")
+except Exception as e:
+    print("Error selecting iloc slice 9:23:", e)
+
+print_section("18) .iloc single column: 5th column (index 4)")
+if df.shape[1] > 4:
+    try:
+        col_5 = df.iloc[:, 4]
+        print(col_5.to_string())
+    except Exception as e:
+        print("Error selecting 5th column:", e)
+else:
+    print("DataFrame has fewer than 5 columns. Columns available:", df.columns.tolist())
+
+print_section("19) .iloc multiple columns: 2nd,3rd,8th")
+col_idxs = [1,2,7]
+valid_cols = [i for i in col_idxs if 0 <= i < df.shape[1]]
+if valid_cols:
+    try:
+        print(df.iloc[:, valid_cols].head(15).to_string())
+    except Exception as e:
+        print("Error selecting columns by iloc:", e)
+else:
+    print("Requested column indices out of bounds. Num columns:", df.shape[1])
+
+print_section("20) .iloc slice columns 2 to 8")
+if df.shape[1] > 1:
+    try:
+        print(df.iloc[:, 1:8].head(15).to_string())
+    except Exception as e:
+        print("Error selecting iloc column slice:", e)
+else:
+    print("Not enough columns for this slice.")
+
+print_section("21) .iloc combined selection (rows 4,5,7,25) x (cols 3,5,7)")
+row_positions = [3,4,6,24]  
+col_positions = [2,4,6]     
+valid_rows = [r for r in row_positions if 0 <= r < len(df)]
+valid_cols = [c for c in col_positions if 0 <= c < df.shape[1]]
+if valid_rows and valid_cols:
+    try:
+        print(df.iloc[valid_rows, valid_cols].to_string())
+    except Exception as e:
+        print("Error in combined iloc selection:", e)
+else:
+    print("Some requested row/col positions out of bounds. rows:", valid_rows, "cols:", valid_cols)
+
+print_section("22) iloc combined: rows example [2,33] and columns 3:6")
+row_positions = [2,33]  
+col_slice = slice(2,6)  
+valid_rows = [r for r in row_positions if 0 <= r < len(df)]
+if valid_rows and df.shape[1] > col_slice.start:
+    try:
+        print(df.iloc[valid_rows, col_slice].to_string())
+    except Exception as e:
+        print("Error selecting specified iloc ranges:", e)
+else:
+    print("Requested rows or columns out of bounds. Valid rows:", valid_rows, "Num cols:", df.shape[1])
+
+print_section("23) Add a new row to DataFrame")
+
+new_row = {col: None for col in df.columns}
+
+for k in ("Year","Industrial_Production","Unemployment_Rate"):
+    if k in df.columns:
+        new_row[k] = 9999 if k=="Year" else 0.0
+df_loc = df.copy()
+df_loc.loc[len(df_loc)] = new_row
+print("New row appended at index", len(df))
+print("Tail after insertion:")
+print(df_loc.tail(5).to_string())
+
+print_section("24) Delete row with index label 4")
+if 0 <= 4 < len(df):
+    df_drop4 = df.drop(4)
+    print("Row 4 dropped. New shape:", df_drop4.shape)
+    print(df_drop4.head(8).to_string())
+else:
+    print("Index 4 not in DataFrame range.")
+
+print_section("25) Delete rows from index 5 to 9 (inclusive)")
+to_drop = list(range(5,10))
+existing = [i for i in to_drop if 0 <= i < len(df)]
+if existing:
+    df_drop_5_9 = df.drop(existing)
+    print("Dropped indices:", existing)
+    print("New shape:", df_drop_5_9.shape)
+    print(df_drop_5_9.head(12).to_string())
+else:
+    print("No matching indices to drop in range 5-9.")
+
+print_section("26) Delete column 'All_Employees'")
+col_del = "All_Employees"
+if col_del in df.columns:
+    df_no_emp = df.drop(columns=[col_del])
+    print(f"Column '{col_del}' dropped. New columns:", df_no_emp.columns.tolist())
+else:
+    print(f"Column '{col_del}' not present. Columns available:", df.columns.tolist()[:12])
+
+print_section("27) Delete PCExpenditures & National_Home_Price_Index")
+cols_to_remove = ["Personal_Consumption_Expenditures","National_Home_Price_Index"]
+present = [c for c in cols_to_remove if c in df.columns]
+if present:
+    df_removed = df.drop(columns=present)
+    print("Dropped columns:", present)
+    print("Remaining columns:", df_removed.columns.tolist())
+else:
+    print("None of the targeted columns present. Available columns:", df.columns.tolist()[:15])
+
+print_section("28) Rename column Personal_Consumption_Expenditures -> Personal_Consumption_Expenditures_Changed")
+old_name = "Personal_Consumption_Expenditures"
+new_name = "Personal_Consumption_Expenditures_Changed"
+if old_name in df.columns:
+    df_ren = df.rename(columns={old_name: new_name})
+    print("Column renamed. New columns include:", new_name in df_ren.columns)
+else:
+    print(f"Column '{old_name}' not found. No rename performed.")
+
+print_section("29) Rename index label from 5 to 8 (index labels are RangeIndex)")
+if 0 <= 5 < len(df):
+    df_idx_ren = df.rename(index={5: 8})
+    print("Index rename attempted. Example slice around labels:")
+    print(df_idx_ren.head(12).to_string())
+else:
+    print("Index 5 out of bounds; cannot rename.")
+
+print_section("30) query() combined condition (IP <=0.5 & CPI > 0.2 & Year == 1992)")
+if col1 in df.columns and cpi_col in df.columns and "Year" in df.columns:
+    try:
+        q = df.query("`Industrial_Production` <= 0.5 and `Consumer_Price Index` > 0.2 and Year == 1992")
+        print(q.to_string() if not q.empty else "No rows match the query.")
+    except Exception as e:
+        print("Error running query():", e)
+else:
+    print("Required columns missing for query. Columns present:", df.columns.tolist()[:12])
+
+print_section("31) Sort by 'Consumer_Price Index' ascending")
+if cpi_col in df.columns:
+    try:
+        df_sorted = df.sort_values(by=cpi_col, ascending=True, na_position='last')
+        print(df_sorted[[cpi_col]].head(15).to_string())
+    except Exception as e:
+        print("Error sorting by CPI:", e)
+else:
+    print(f"Column '{cpi_col}' not found; cannot sort.")
+
+print_section("32) Group by Year and sum National_Home_Price_Index")
+nhpi = "National_Home_Price_Index"
+if "Year" in df.columns and nhpi in df.columns:
+    try:
+        grp = df.groupby("Year")[nhpi].sum()
+        print(grp.to_string())
+    except Exception as e:
+        print("Error grouping and summing:", e)
+else:
+    print(f"Either 'Year' or '{nhpi}' missing. Columns present: {df.columns.tolist()[:15]}")
+
+print_section("33) dropna() remove rows with any missing values")
+df_dropna = df.dropna(how='any')
+print("Before dropna, shape:", df.shape, "After dropna, shape:", df_dropna.shape)
+print(df_dropna.head(10).to_string() if not df_dropna.empty else "No rows left after dropna.")
+
+print_section("34) fillna(0) - replace NaN with 0")
+df_fill0 = df.fillna(0)
+print("Preview after fillna(0):")
+print(df_fill0.head(12).to_string())
+
+print("\n\nDone. Review the printed outputs above for verification and analysis.")
