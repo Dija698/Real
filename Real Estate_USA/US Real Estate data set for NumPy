@@ -1,0 +1,15 @@
+import pandas as pd
+import numpy as np
+
+df = pd.read_csv('Real_Estate_Sales_2001-2022_GL-Short (1).csv')
+
+df_clean = df[['Serial Number', 'List Year']].dropna()
+
+data = df_clean.to_numpy()
+
+year_built = data[:, 0]
+sale_amount = data[:, 1]
+
+print(f"Mean Sale Amount: ${np.mean(sale_amount):,.2f}")
+print(f"Properties built after 2000: {np.sum(year_built > 2000)}")
+print(f"Max Sale Price: ${np.max(sale_amount):,.2f}")

@@ -1,0 +1,47 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("Real_Estate_Sales_2001-2022_GL-Short (1).csv")
+print("Initial columns:", df.columns)
+print("Initial row count:", len(df))
+
+expected_cols = ['Serial Number', 'List Year']
+for col in expected_cols:
+    if col not in df.columns:
+        raise ValueError(f"Missing column: {col}")
+
+df_clean = df.dropna(subset=expected_cols)
+print("After dropna(subset):", len(df_clean))
+
+df_clean['Serial Number'] = pd.to_numeric(df_clean['Serial Number'], errors='coerce')
+df_clean['List Year'] = pd.to_numeric(df_clean['List Year'], errors='coerce')
+
+df_clean = df_clean.dropna(subset=['Serial Number', 'List Year'])
+print("After numeric conversion and dropna:", len(df_clean))
+
+if df_clean.empty:
+    raise ValueError("No data left after cleaning. Please inspect the input CSV.")
+
+plt.figure(figsize=(10, 6))
+sns.histplot(df_clean['Serial Number'], bins=50, kde=True, color='Black')
+plt.title("Distribution of Sale Prices")
+plt.xlabel("Sale Amount ($)")
+plt.ylabel("Count")
+plt.tight_layout()
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.scatterplot(data=df_clean, x='List Year', y='Serial Number', alpha=0.5)
+plt.title("Sale Price vs Year Built")
+plt.xlabel("Year Built")
+plt.ylabel("Sale Price ($)")
+plt.tight_layout()
+plt.show()
+
+plt.figure(figsize=(14, 6))
+sns.boxplot(data=df_clean, x='List Year', y='Serial Number')
+plt.title("Sale Prices by Listing Year")
+plt.xticks(rotation=90)
+plt.tight_layout()
+plt.show()

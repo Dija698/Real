@@ -1,0 +1,17 @@
+import pandas as pd
+
+df = pd.read_csv("Real_Estate_Sales_2001-2022_GL-Short (1).csv")
+
+print(df.head())
+
+print(df.info())
+
+print("Mean Sale Price:", df['Serial Number'].mean())
+
+print("Properties built after 2000:", df[df['List Year'] > 2000].shape[0])
+
+sales_2020 = df[df['List Year'] == 2020]
+print("Sales in 2020:", sales_2020.shape[0])
+
+print("Top 5 sales:")
+print(df.sort_values('Serial Number', ascending=False).head())
